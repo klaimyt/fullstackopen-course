@@ -1,0 +1,20 @@
+To get the diagram go to https://www.websequencediagrams.com/ and paste this:
+
+note over browser:
+After submit button clicked
+the browser sends a post
+to the server in JSON fromat
+end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+note over server:
+The server asks the browser to do
+a new HTTP GET request to the address
+defined in the header's Location - the address notes.
+end note
+server-->browser: Status code 302 (REDIRECT)
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+server-->browser: HTML-code
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server-->browser: main.css
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+server-->browser: main.js

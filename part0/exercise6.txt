@@ -1,0 +1,10 @@
+To get the diagram go to https://www.websequencediagrams.com/ and paste this:
+
+note over browser:
+After submit button clicked
+the function inside spa.js push
+the note to DOM and then
+sends this note to server
+end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: Server response with {"message":"note created"}
