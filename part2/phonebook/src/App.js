@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
-import axios from "axios";
+import personService from "./services/PersonService";
 
 const App = () => {
   // Persons with dummy data
@@ -14,9 +14,7 @@ const App = () => {
   const [filter, setFilter] = useState("");
 
   useEffect(() => {
-    axios
-      .get("http://localhost:3001/persons")
-      .then((response) => setPersons(response.data));
+    personService.getAll().then((persons) => setPersons(persons));
   }, []);
 
   const personsToShow =
@@ -30,25 +28,55 @@ const App = () => {
 
   const addPerson = (e) => {
     e.preventDefault();
-    const isExists = persons.find(
+    const existsPerson = persons.find(
       (person) => person.name.toLocaleLowerCase() === newName.toLowerCase()
     );
-    if (isExists) {
-      alert(`${newName} is already added to phonebook`);
-      return;
+    if (existsPerson) {
+      const message = `${newName} is already added to phonebook, replace the old number with a new one?`;
+      if (!window.confirm(message)) return;
+      personService
+        .update(existsPerson.id, {
+          ...existsPerson,
+          number: newNumber,
+        })
+        .then((returnedPerson) =>
+          setPersons(
+            persons.map((person) =>
+              returnedPerson.id === person.id ? returnedPerson : person
+            )
+          )
+        )
+        .catch((err) => alert("Error: Peson hasn't been updated"));
+    } else {
+      const newPerson = {
+        name: newName,
+        number: newNumber,
+      };
+      personService
+        .create(newPerson)
+        .then((newPerson) => setPersons([...persons, newPerson]))
+        .catch((err) => alert("Error: person hasn't been added"));
     }
-    const newPerson = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
-    };
-    setPersons([...persons, newPerson]);
     setNewName("");
     setNewNumber("");
   };
 
   const filterHandler = (e) => {
     setFilter(e.target.value.toLowerCase());
+  };
+
+  const deleteHandler = (personToDelete) => {
+    if (!window.confirm(`Delete ${personToDelete.name}?`)) return;
+    personService
+      .deletePerson(personToDelete.id)
+      .then(() =>
+        setPersons(
+          persons.filter(
+            (filterPerson) => personToDelete.id !== filterPerson.id
+          )
+        )
+      )
+      .catch((err) => alert("Error: Persons hasn't beend deleted."));
   };
 
   return (
@@ -69,7 +97,7 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} deleteHandler={deleteHandler} />
     </div>
   );
 };
