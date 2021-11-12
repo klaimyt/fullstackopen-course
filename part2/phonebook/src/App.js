@@ -3,6 +3,7 @@ import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/PersonService";
+import Notification from "./components/Notification";
 
 const App = () => {
   // Persons with dummy data
@@ -12,6 +13,10 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [filter, setFilter] = useState("");
+  const [notification, setNotigication] = useState({
+    message: null,
+    isError: null,
+  });
 
   useEffect(() => {
     personService.getAll().then((persons) => setPersons(persons));
@@ -39,14 +44,21 @@ const App = () => {
           ...existsPerson,
           number: newNumber,
         })
-        .then((returnedPerson) =>
+        .then((returnedPerson) => {
           setPersons(
             persons.map((person) =>
               returnedPerson.id === person.id ? returnedPerson : person
             )
-          )
-        )
-        .catch((err) => alert("Error: Peson hasn't been updated"));
+          );
+          showNotification(`${existsPerson.name} updated`, false);
+        })
+        .catch((err) => {
+          showNotification(
+            `Error: ${existsPerson.name} has been removed from server`,
+            true
+          );
+          setPersons(persons.filter((person) => person.id !== existsPerson.id));
+        });
     } else {
       const newPerson = {
         name: newName,
@@ -54,8 +66,13 @@ const App = () => {
       };
       personService
         .create(newPerson)
-        .then((newPerson) => setPersons([...persons, newPerson]))
-        .catch((err) => alert("Error: person hasn't been added"));
+        .then((newPerson) => {
+          setPersons([...persons, newPerson]);
+          showNotification(`Added ${newPerson.name}`, false);
+        })
+        .catch((err) =>
+          showNotification(`Error: ${newPerson.name} hasn't been added`, true)
+        );
     }
     setNewName("");
     setNewNumber("");
@@ -69,19 +86,33 @@ const App = () => {
     if (!window.confirm(`Delete ${personToDelete.name}?`)) return;
     personService
       .deletePerson(personToDelete.id)
-      .then(() =>
+      .then(() => {
         setPersons(
           persons.filter(
             (filterPerson) => personToDelete.id !== filterPerson.id
           )
+        );
+        showNotification(`Deleted ${personToDelete.name}`, false);
+      })
+      .catch((err) =>
+        showNotification(
+          `Error: ${personToDelete.name} hasn't beend deleted.`,
+          true
         )
-      )
-      .catch((err) => alert("Error: Persons hasn't beend deleted."));
+      );
+  };
+
+  // Helper
+  const showNotification = (message, isError) => {
+    setNotigication({ message, isError });
+    setTimeout(() => setNotigication(null), 4000);
   };
 
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification notification={notification} />
 
       <Filter filterHandler={filterHandler} />
 

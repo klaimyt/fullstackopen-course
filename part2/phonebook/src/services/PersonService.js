@@ -18,4 +18,5 @@ const deletePerson = (id) => {
   return axios.delete(baseUrl + `/${id}`).then((res) => res.data);
 };
 
+// eslint-disable-next-line
 export default { getAll, create, deletePerson, update };
