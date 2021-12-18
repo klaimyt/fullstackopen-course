@@ -1,0 +1,19 @@
+GET http://localhost:3001/api/persons
+
+###
+GET http://localhost:3001/api/persons/61bdcc8756cef8701b84c1da
+
+###
+GET http://localhost:3001/api/persons/1000
+
+###
+DELETE http://localhost:3001/api/persons/61bdd8b98eed213541231eaf
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Dama",
+  "number": "555-404-321"
+}
