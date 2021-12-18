@@ -54,7 +54,7 @@ const App = () => {
         })
         .catch((err) => {
           showNotification(
-            `Error: ${existsPerson.name} has been removed from server`,
+            err.response.data.error,
             true
           );
           setPersons(persons.filter((person) => person.id !== existsPerson.id));
@@ -71,7 +71,7 @@ const App = () => {
           showNotification(`Added ${newPerson.name}`, false);
         })
         .catch((err) =>
-          showNotification(`Error: ${newPerson.name} hasn't been added`, true)
+          showNotification(err.response.data.error, true)
         );
     }
     setNewName("");
