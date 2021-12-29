@@ -6,6 +6,7 @@ const app = express();
 const cors = require("cors");
 const config = require("./utils/config");
 const logger = require("./utils/logger");
+require("express-async-errors");
 
 logger.info("Connecting to DB...");
 
@@ -21,4 +22,4 @@ app.use("/api/blogs", blogsRouter);
 app.use(middleware.unknownEndpoint);
 app.use(middleware.errorHandler);
 
-module.exports = app
+module.exports = app;
