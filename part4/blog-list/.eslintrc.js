@@ -13,5 +13,6 @@ module.exports = {
   },
   rules: {
     'linebreak-style': 0,
+    'consistent-return': true,
   },
 };

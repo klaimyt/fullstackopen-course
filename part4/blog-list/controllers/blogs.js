@@ -1,34 +1,49 @@
-const notesRouter = require('express').Router();
+const blogsRouter = require('express').Router();
 const Blog = require('../models/blog');
+const { userExtractor } = require('../utils/middleware');
 
-notesRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({});
-  response.json(blogs);
+blogsRouter.get('/', async (req, res) => {
+  const blogs = await Blog.find({}).populate('user', { username: 1, id: 1 });
+  res.json(blogs);
 });
 
-notesRouter.get('/:id', async (request, response) => {
-  const blog = await Blog.findById(request.params.id);
-  response.json(blog);
+blogsRouter.get('/:id', async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  if (!blog) return res.status(404).end();
+  res.json(blog);
 });
 
-notesRouter.post('/', async (request, response) => {
-  const blog = new Blog(request.body);
+blogsRouter.post('/', userExtractor, async (req, res) => {
+  req.body.user = req.user.id.toString();
+  const blog = new Blog(req.body);
 
   const result = await blog.save();
-
-  response.status(201).json(result);
+  req.user.blogs.push(blog.id.toString());
+  await req.user.save();
+  res.status(201).json(result);
 });
 
-notesRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndRemove(request.params.id);
-  response.status(204).end();
+blogsRouter.delete('/:id', userExtractor, async (req, res) => {
+  const blog = await Blog.findById(req.params.id);
+  if (blog.user.toString() !== req.user.id.toString()) {
+    return res.status(403).json({ error: 'You have no access to delete this blog ' });
+  }
+  req.user.blogs = req.user.blogs.filter((b) => b.toString() !== blog.id.toString());
+  await req.user.save();
+  await blog.delete();
+  res.status(204).end();
 });
 
-notesRouter.put('/:id', async (request, response) => {
-  const blog = await Blog
-    .findByIdAndUpdate(request.params.id, request.body, { runValidators: true, new: true });
+blogsRouter.put('/:id', userExtractor, async (req, res) => {
+  let blog = await Blog.findById(req.params.id);
 
-  response.send(blog);
+  if (blog.user.toString() !== req.user.id.toString()) {
+    return res.status(403).json({ error: 'You have no access to modify this blog' });
+  }
+
+  blog = await blog.updateOne(req.body, { runValidators: true, new: true });
+
+  res.send(blog);
 });
 
-module.exports = notesRouter;
+module.exports = blogsRouter;
