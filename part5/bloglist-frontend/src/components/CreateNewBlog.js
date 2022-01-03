@@ -1,6 +1,7 @@
-import React from "react";
+import React from 'react'
+import PropTypes from 'prop-types'
 
-const CreateNewBlog = ({handleNewBlog}) => {
+const CreateNewBlog = ({ handleNewBlog }) => {
   return (
     <div>
       <h1>create new</h1>
@@ -20,6 +21,11 @@ const CreateNewBlog = ({handleNewBlog}) => {
         <button type="submit">create</button>
       </form>
     </div>
-  );
-};
-export default CreateNewBlog;
+  )
+}
+
+CreateNewBlog.propTypes = {
+  handleNewBlog: PropTypes.func.isRequired,
+}
+
+export default CreateNewBlog
