@@ -20,8 +20,13 @@ const Blog = ({ blog, handleBlogUpdate, handleBlogRemove, handleNotification }) 
       user: blog.user.id,
     }
 
-    await blogService.modify(blog.id, updatedBlog)
-    handleBlogUpdate(blog)
+    try {
+      await blogService.modify(blog.id, updatedBlog)
+      handleBlogUpdate(blog)
+    } catch (err) {
+      const errorMessage = err.response.data.error || err.message
+      handleNotification(`Error. Like hasn't been added: ${errorMessage}`, true)
+    }
   }
 
   const handleRemove = async () => {
@@ -40,10 +45,10 @@ const Blog = ({ blog, handleBlogUpdate, handleBlogRemove, handleNotification }) 
     <button onClick={() => setBlogDetailsIsShown(!blogDetailIsShown)}>{blogDetailIsShown ? 'hide' : 'view'}</button>
   )
 
-  const likeButton = () => <button onClick={() => handleLikes(blog)}>like</button>
+  const likeButton = () => <button onClick={handleLikes}>like</button>
 
   const detail = () => (
-    <div>
+    <div className="detail">
       <p>{blog.url}</p>
       <p>
         likes {blog.likes} {likeButton()}
@@ -54,8 +59,11 @@ const Blog = ({ blog, handleBlogUpdate, handleBlogRemove, handleNotification }) 
   )
 
   return (
-    <div style={blogStyle}>
-      <span>{blog.title}</span> {blogDetailButton()}
+    <div style={blogStyle} className="blog">
+      <span>
+        {blog.title} {blog.author}
+      </span>{' '}
+      {blogDetailButton()}
       {blogDetailIsShown && detail()}
     </div>
   )
@@ -65,7 +73,7 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   handleBlogUpdate: PropTypes.func.isRequired,
   handleBlogRemove: PropTypes.func.isRequired,
-  handleNotification: PropTypes.func.isRequired
+  handleNotification: PropTypes.func.isRequired,
 }
 
 export default Blog

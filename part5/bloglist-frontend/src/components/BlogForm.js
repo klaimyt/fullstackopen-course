@@ -23,21 +23,10 @@ const BlogForm = ({ handleLogout, handleNotification, user }) => {
     setBlogs(sortBlogs(blogs))
   }, [blogs.length])
 
-  const handleNewBlog = async (event) => {
-    event.preventDefault()
-
-    const { target } = event
-
-    const newBlog = {
-      title: target.title.value,
-      author: target.author.value,
-      url: target.url.value,
-    }
-
+  const createNewBlog = async (newBlog) => {
     try {
       const response = await blogService.create(newBlog)
       setBlogs(blogs.concat(response))
-      target.reset()
       handleNotification(`a new blog: ${newBlog.title} by ${newBlog.author} added`, false)
       newBlogRef.current.toggleVisibility()
     } catch (error) {
@@ -67,7 +56,7 @@ const BlogForm = ({ handleLogout, handleNotification, user }) => {
       <button onClick={handleLogout}>logout</button>
 
       <Togglable buttonLabel={'create new blog'} ref={newBlogRef}>
-        <CreateNewBlog handleNewBlog={handleNewBlog} />
+        <CreateNewBlog createNewBlog={createNewBlog} />
       </Togglable>
 
       {blogs.map((blog) => (
