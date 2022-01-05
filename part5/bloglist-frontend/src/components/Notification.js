@@ -18,7 +18,7 @@ const Notification = ({ notification }) => {
     return null
   }
 
-  return <div style={style}>{message}</div>
+  return <div style={style} className="notification">{message}</div>
 }
 
 Notification.protoTypes = {

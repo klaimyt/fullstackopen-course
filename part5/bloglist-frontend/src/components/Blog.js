@@ -50,7 +50,7 @@ const Blog = ({ blog, handleBlogUpdate, handleBlogRemove, handleNotification }) 
   const detail = () => (
     <div className="detail">
       <p>{blog.url}</p>
-      <p>
+      <p className='likes'>
         likes {blog.likes} {likeButton()}
       </p>
       <p>{blog.author}</p>
