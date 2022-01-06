@@ -1,11 +1,13 @@
-export const setNotification = (text, timeout) => {
-
-  return {
-    type: 'SET_NOTIFICATION',
-    notification: {
-      text,
-      timeout
-    }
+export const setNotification = (text, time) => {
+  return dispatch => {
+    const timeout = setTimeout(() => dispatch(removeNotification()), time * 1000)
+    dispatch({
+      type: 'SET_NOTIFICATION',
+      notification: {
+        text,
+        timeout
+      }
+    })
   }
 }
 
