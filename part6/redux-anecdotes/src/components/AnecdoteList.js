@@ -1,13 +1,13 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { increaseVote } from '../reducers/anecdoteReducer'
-import { setNotification, removeNotification } from '../reducers/notificationReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = () => {
   const anecdotes = useSelector(state => {
     const sortedAnecdotes = state.anecdotes.slice().sort((a, b) => b.votes - a.votes)
     if (state.filter === '') return sortedAnecdotes
-    const regex = new RegExp(String.raw`${state.filter}`, 'ig')
+    const regex = new RegExp(String.raw`${state.filter}`, 'i')
     return sortedAnecdotes.filter(({content}) => regex.test(content))
   })
   const dispatch = useDispatch()
